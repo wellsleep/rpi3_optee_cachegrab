@@ -29,7 +29,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
-
+#include <pthread.h>
 /* The following section is usually included in sched.h, but not in Android.
  * We'll just define it on our own. */
 #define CPU_SETSIZE 1024
