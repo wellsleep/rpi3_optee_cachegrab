@@ -26,11 +26,14 @@
 
 #include <mongoose.h>
 #include <stdio.h>
+#include <unistd.h> //for daemon()
 
 #include "scope.h"
 #include "server_capture.h"
 #include "server_probe.h"
 #include "server_scope.h"
+
+#define _BSD_SOURCE //for daemon()
 
 static struct mg_mgr mgr;
 static struct mg_connection *nc;

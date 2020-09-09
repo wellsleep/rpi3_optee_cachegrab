@@ -24,13 +24,13 @@
 
 #include "capture_data.h"
 
-#include <png.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "scope.h"
+#include "png.h"
 
 struct capture_data* capture_data_retrieve () {
   struct capture_data* ret;

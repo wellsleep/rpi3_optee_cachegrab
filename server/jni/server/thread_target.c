@@ -27,6 +27,7 @@
 #include <sched.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <memory.h>
 
 #include "scope.h"
 

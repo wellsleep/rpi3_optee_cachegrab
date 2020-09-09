@@ -26,6 +26,7 @@
 #define CAPTURE_DATA_H__
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 struct enc_buffer {
   uint8_t *buf;

@@ -26,6 +26,7 @@
 #define UTILS_H
 
 #include <stdlib.h>
+#include <stdint.h>
 
 /**
  * Convert a hexadecimal string to a byte array.

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <memory.h>
 
 #include "driver.h"
 

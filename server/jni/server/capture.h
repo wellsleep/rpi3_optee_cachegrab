@@ -29,15 +29,20 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <memory.h>
+#include <sched.h>
 
 /* The following section is usually included in sched.h, but not in Android.
  * We'll just define it on our own. */
 #define CPU_SETSIZE 1024
-#define __NCPUBITS  (8 * sizeof (unsigned long))
-typedef struct
-{
-   unsigned long __bits[CPU_SETSIZE / __NCPUBITS];
-} cpu_set_t;
+
+// available in Linux headers
+//#define __cg_NCPUBITS  (8 * sizeof (unsigned long))
+//typedef struct
+//{
+//   unsigned long __bits[CPU_SETSIZE / __cg_NCPUBITS];
+//} cpu_set_t;
 
 #define CPU_SET(cpu, cpusetp) \
   ((cpusetp)->__bits[(cpu)/__NCPUBITS] |= (1UL << ((cpu) % __NCPUBITS)))
