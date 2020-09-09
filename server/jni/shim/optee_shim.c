@@ -122,6 +122,8 @@ void init (void) {
 
   if (valid && cg_debug)
     cg_log("Successfully initialized");
+
+  printf("<== hook init done ==>\n\n");
 }
 
 bool load_funcs () {
@@ -219,7 +221,7 @@ void stop_intercept() {
 
 int TEEC_InitializeContext(const char *name, void *ctx) {
   cg_log("Initialze Ctx");
-  int res = TEEC_InitializeContext(name, ctx);
+  int res = TEEC_InitializeContext_orig(name, ctx);
   cg_log("InitializeContext return %x", res);
 
   return res;
@@ -227,7 +229,7 @@ int TEEC_InitializeContext(const char *name, void *ctx) {
 int TEEC_FinalizeContext(void *ctx) {
 
   cg_log("Finalize Ctx");
-  int res = TEEC_FinalizeContext(ctx);
+  int res = TEEC_FinalizeContext_orig(ctx);
   cg_log("FinalizeContext return %x", res);
 
   return res;
