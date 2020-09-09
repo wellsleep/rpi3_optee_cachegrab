@@ -1,5 +1,5 @@
 PROJ=cachegrab_server
-SHIM=libcachegrab_shim.so
+SHIM=libcachegrab_optee_shim.so
 TMPDIR=/data/local/tmp
 
 $(PROJ):
