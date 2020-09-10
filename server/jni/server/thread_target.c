@@ -114,13 +114,13 @@ bool run_command (struct target_args* arg) {
     close(err_pipe[0]);
     close(err_pipe[1]);
 
-    setenv("LD_LIBRARY_PATH", "/data/local/tmp", 1);
+    setenv("LD_LIBRARY_PATH", "/lib", 1);
     setenv(ENV_NAME, arg->name, 1);
     setenv(ENV_CMDBUF, arg->cbuf, 1);
     setenv(ENV_DEBUG, arg->debug ? "y" : "n", 1);
     
-    char* argv[] = {"/system/bin/sh", "-c", arg->command, NULL};
-    execv("/system/bin/sh", argv);
+    char* argv[] = {"/bin/sh", "-c", arg->command, NULL};
+    execv("/bin/sh", argv);
     exit(-1);
   } else {
     // Parent
