@@ -94,13 +94,19 @@ void probe_l1d_measure(u64 * buf, struct probe_l1d *p)
 	volatile u8 *addr_base;
 	u64 val = 0;
 	s_count = set_count(start, p->base.cfg.set_end, nsets);
-
+	
+	
 	offset_from_base = (start - p->base.set_offset + nsets) % nsets;
-	addr_base = p->kernel_code_base + line_size * offset_from_base;
+	addr_base = p->kernel_code_base + line_size * offset_from_base + 0x2000; // [lz] 0x2000 is offset to 'kernel_img_size', should be safe.
+	//DEBUG("[measure]offset_from_base=%x, p->base.set_offset=%x\n", offset_from_base, p->base.set_offset);
+	//DEBUG("[measure]p->kernel_code_base=%p, addr_base=%p\n", p->kernel_code_base, addr_base);
+	
 	for (way = 0; way < nways; way++) {
 		addr = addr_base + line_size * way * nsets;
+		//DEBUG("[measure]%p\n",addr);
 		for (set = 0; set < s_count; set++) {
 			*addr;
+			//DEBUG("[measure]%x\n",*addr);
 			dsb(sy);
 			isb();
 			asm volatile ("mrs %0, pmxevcntr_el0":"=r" (val));
@@ -123,9 +129,13 @@ void probe_l1d_refill(u64 * buf, struct probe_l1d *p)
 	s_count = set_count(start, p->base.cfg.set_end, nsets);
 
 	offset_from_base = (start - p->base.set_offset + nsets) % nsets;
-	addr_base = p->kernel_code_base + line_size * offset_from_base;
+	addr_base = p->kernel_code_base + line_size * offset_from_base + 0x2000;
+	//DEBUG("[refill]offset_from_base=%x, p->base.set_offset=%x\n", offset_from_base, p->base.set_offset);
+	//DEBUG("[refill]p->kernel_code_base=%p, addr_base=%p\n", p->kernel_code_base, addr_base);
+	
 	for (way = 0; way < nways; way++) {
 		addr = addr_base + line_size * way * nsets;
+		//DEBUG("[refill]%p\n",addr);
 		for (set = 0; set < s_count; set++) {
 			*addr;
 			addr += line_size;
