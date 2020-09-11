@@ -70,7 +70,7 @@ bool get_capture_config (struct capture_config *cfg, struct mg_str *ps, bool url
   if (!cfg->command)
     goto memerr;
   memcpy(cfg->command, command, len + 1);
-  printf("command: %s\n", command);
+  fprintf(stdout, "command: %s\n", command);
 
   name[0] = '\0';
   if ((len = mg_get_http_var(ps, "ta_name", name, sizeof(name))) < 0)
@@ -79,7 +79,7 @@ bool get_capture_config (struct capture_config *cfg, struct mg_str *ps, bool url
   if (!cfg->name)
     goto memerr;
   memcpy(cfg->name, name, len + 1);
-  printf("ta_name: %s\n", name);
+  fprintf(stdout, "ta_name: %s\n", name);
 
   cbuf[0] = '\0';
   if ((len = mg_get_http_var(ps, "trigger_cbuf", cbuf, sizeof(cbuf))) < 0)
@@ -88,7 +88,7 @@ bool get_capture_config (struct capture_config *cfg, struct mg_str *ps, bool url
   if (!cfg->cbuf)
     goto memerr;
   memcpy(cfg->cbuf, cbuf, len + 1);
-  printf("trigger value: %s\n", cbuf);
+  fprintf(stdout, "trigger value: %s\n", cbuf);
 
   if (mg_get_http_var(ps, "debug", debug, sizeof(debug)) > 0 &&
       0 == strcmp("y", debug)) {

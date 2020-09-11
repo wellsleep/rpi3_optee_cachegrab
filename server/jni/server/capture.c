@@ -42,6 +42,8 @@ void get_capture_data (void) {
   void* encoded_data;
   size_t encoded_len;
   
+  // [lz]
+  fprintf(stdout, "get_capture_data()\n");
   encoded_data = capture_data_encode(&data->l1d_probe, &encoded_len);
   scope_set_probe_data(PROBE_TYPE_L1D, encoded_data, encoded_len);
 

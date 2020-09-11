@@ -152,10 +152,13 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
 
   if (len)
     *len = 0;
-  
+  // [lz]
+  fprintf(stdout, "d=%p, len=%ln, d->collected=%d, d->sample_count=%d\n", d, len, d->collected, d->sample_count);
   if (d == NULL || len == NULL || !d->collected || d->sample_count == 0)
     goto end;
-  
+
+  // [lz]
+  fprintf(stdout, "png encoding start!\n");
   png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (png == NULL)
     goto end;
@@ -199,6 +202,9 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
   ret = enc.buf;
   *len = enc.len;
   enc.buf = NULL;
+
+  // [lz]
+  fprintf(stdout, "png encoding done! \n");
  end:
   if (enc.buf)
     free(enc.buf);

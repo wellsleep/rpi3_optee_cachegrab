@@ -165,7 +165,8 @@ int main (int argc, char** argv) {
     return -1;
   }
 
-  daemon(0, 0);
+  // daemon(0, 0); [lz] by default, no output
+  daemon(0, 1);
   server_run();
 
   server_term();
