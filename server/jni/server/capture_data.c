@@ -47,9 +47,10 @@ struct capture_data* capture_data_retrieve () {
   nsamples = scope_sample_count();
 
   // Allocate it
-  uint8_t* tmp;
+  uint8_t* tmp=NULL;
   size_t tmp_sz = nsamples * desc.total_size;
   tmp = (uint8_t*)malloc(tmp_sz);
+  //fprintf(stdout, "malloc ptr=%p\n", tmp);
   if (!tmp)
     goto fail;
 
@@ -81,6 +82,7 @@ struct capture_data* capture_data_retrieve () {
   }
 
   // Copy from kernel
+  //fprintf(stdout, "tmp=%p\n", tmp);
   scope_retrieve(tmp, &tmp_sz);
   nsamples = tmp_sz / desc.total_size;
 
@@ -111,6 +113,7 @@ struct capture_data* capture_data_retrieve () {
   }
 
   free(tmp);
+  tmp=NULL;
   return ret;
  fail:
   if (tmp)
@@ -153,12 +156,12 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
   if (len)
     *len = 0;
   // [lz]
-  fprintf(stdout, "d=%p, len=%ln, d->collected=%d, d->sample_count=%d\n", d, len, d->collected, d->sample_count);
+  // fprintf(stdout, "d=%p, len=%ln, d->collected=%d, d->sample_count=%d\n", d, len, d->collected, d->sample_count);
   if (d == NULL || len == NULL || !d->collected || d->sample_count == 0)
     goto end;
 
   // [lz]
-  fprintf(stdout, "png encoding start!\n");
+  // fprintf(stdout, "png encoding start!\n");
   png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (png == NULL)
     goto end;
@@ -204,7 +207,7 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
   enc.buf = NULL;
 
   // [lz]
-  fprintf(stdout, "png encoding done! \n");
+  // fprintf(stdout, "png encoding done! \n");
  end:
   if (enc.buf)
     free(enc.buf);

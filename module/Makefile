@@ -28,5 +28,4 @@ style:
 	indent -linux src/*.c src/*.h
 
 clean:
-	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) clean
-	rm -rf *~ src/*~
+	rm -rf *.o, *.mod.* src/*.o

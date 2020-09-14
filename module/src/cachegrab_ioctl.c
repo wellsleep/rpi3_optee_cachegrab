@@ -204,14 +204,19 @@ long scope_retrieve_ioctl(void __user * p)
 {
 	struct arg_scope_retrieve arg;
 	if (copy_from_user(&arg, p, sizeof(arg)) != 0)
+		// DEBUG("error in copy_from_user\n");
 		return CG_PERM;
 
+	//DEBUG("arg.buf=%p\n", arg.buf);
 	if (!access_ok(VERIFY_WRITE, arg.buf, arg.len))
+		//DEBUG("error in access_ok\n");
 		return CG_PERM;
 
 	scope_retrieve(arg.buf, &arg.len);
+	// DEBUG("scope_retrieve passed!\n");
 
 	if (copy_to_user(p, &arg, sizeof(arg)) != 0)
+		// DEBUG("error in copy_to_user\n");
 		return CG_PERM;
 
 	return CG_OK;

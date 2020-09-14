@@ -120,7 +120,7 @@ bool run_command (struct target_args* arg) {
     setenv(ENV_CMDBUF, arg->cbuf, 1);
     setenv(ENV_DEBUG, arg->debug ? "y" : "n", 1);
    
-    fprintf(stdout, "run_command: %s\n", arg->command); 
+    // fprintf(stdout, "run_command: %s\n", arg->command); 
     char* argv[] = {"/bin/sh", "-c", arg->command, NULL};
     execv("/bin/sh", argv);
     exit(-1);

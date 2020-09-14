@@ -373,6 +373,7 @@ void scope_retrieve(void *buf, size_t * len)
 	u8 *cur_loc;
 
 	if (buf == NULL || len == NULL)
+		//DEBUG("buf is NULL in scope_retrieve!");
 		return;
 
 	DEBUG("Attempting to write to buffer %p of length %zu\n", buf, *len);

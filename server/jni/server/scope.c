@@ -358,6 +358,7 @@ void scope_retrieve (void *buf, size_t *len) {
     
   p.buf = buf;
   p.len = *len;
+  //fprintf(stdout, "buf=%p\n", buf);
   ret = ioctl(s.driver_fd, CG_SCOPE_RETRIEVE, &p);
   
   if (ret < 0)
