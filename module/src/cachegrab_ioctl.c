@@ -25,6 +25,7 @@
 #include "cachegrab_ioctl.h"
 
 #include <asm/uaccess.h>
+#include <linux/slab.h>
 
 #include "cachegrab.h"
 #include "scope.h"
@@ -202,6 +203,8 @@ long scope_flush_ioctl(void)
 
 long scope_retrieve_ioctl(void __user * p)
 {
+	uint8_t *kern_buf;
+
 	struct arg_scope_retrieve arg;
 	if (copy_from_user(&arg, p, sizeof(arg)) != 0)
 		// DEBUG("error in copy_from_user\n");
@@ -211,14 +214,40 @@ long scope_retrieve_ioctl(void __user * p)
 	if (!access_ok(VERIFY_WRITE, arg.buf, arg.len))
 		//DEBUG("error in access_ok\n");
 		return CG_PERM;
+	
+	// to prevent kernel module manipulate userland data, copy all data to kernel space
+	// theoratically it should be ok
+	kern_buf = (uint8_t *)kmalloc(sizeof(uint8_t) * arg.len, GFP_KERNEL);
+	if (NULL == kern_buf) {
+		DEBUG("kmalloc fail!");
+		kfree(kern_buf);
+		kern_buf = NULL;
+		return CG_PERM;
+	}
 
-	scope_retrieve(arg.buf, &arg.len);
+	//if (copy_from_user(kern_buf, arg.buf, arg.len) != 0) {
+	//	DEBUG("copy to kern error");
+	//	kfree(kern_buf);
+	//	return CG_PERM;
+	//}
+
+	// get sample data from kernel list, write to kern_buf
+	scope_retrieve(kern_buf, &arg.len);
+	//scope_retrieve(arg.buf, &arg.len);
 	// DEBUG("scope_retrieve passed!\n");
 
-	if (copy_to_user(p, &arg, sizeof(arg)) != 0)
-		// DEBUG("error in copy_to_user\n");
+	if (copy_to_user(arg.buf, kern_buf, sizeof(uint8_t) * arg.len) != 0) {
+		DEBUG("error when copy to user");
+		kfree(kern_buf);
 		return CG_PERM;
+	}
 
+	if (copy_to_user(p, &arg, sizeof(arg)) != 0) {
+		// DEBUG("error in copy_to_user\n");
+		kfree(kern_buf);
+		return CG_PERM;
+	}
+	kfree(kern_buf);
 	return CG_OK;
 }
 

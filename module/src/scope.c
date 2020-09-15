@@ -383,6 +383,7 @@ void scope_retrieve(void *buf, size_t * len)
 	remaining = *len;
 	written = 0;
 	cur_loc = (u8 *) buf;
+	//DEBUG("cur_loc=%p, about to loop", cur_loc);
 
 	list_for_each_safe(cur, next, &collected_samples) {
 		// Only copy data if there's room
@@ -391,6 +392,8 @@ void scope_retrieve(void *buf, size_t * len)
 
 		// Copy data from list element
 		samp = list_entry(cur, struct scope_sample, list);
+		//DEBUG("before memcpy, cur_loc=%p", cur_loc);
+		//DEBUG("value=%x", *cur_loc);
 		memcpy(cur_loc, samp->data, samp_size);
 		cur_loc += samp_size;
 		written += samp_size;
