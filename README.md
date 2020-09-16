@@ -1,5 +1,22 @@
 This is a migration of cachegrab from Nexus 5X to RPi 3B.
 
+The goal of this project is to make experiments of P&P cache attack on RPi 3B.
+Currently the ToE environtment is as following:
+**Hardware**
+- Raspberry Pi 3B with BCM2837 SoC and 1GB DDR.
+
+**Software**
+- A mixed implementation of Ubuntu 18.04.5 and OP-TEE (v3.1.0) for RPi 3B. Details: https://github.com/mnwrhsn/RPi3_OPTEE_3.1
+- Cachegrab originally comes from repo: https://github.com/nccgroup/cachegrab
+
+**Test**
+- Test was done using OP-TEE original TA: optee_example_aes. Cachegrab successfully captured the l1d and l1i trace on RPi 3B with trigger buffer = 3.
+
+**Limitation**
+- Ubuntu Linux kernel 5.x was replaced by OP-TEE Linux kernel, which is 4.6.3.
+- Ubuntu can't DHCP for IP, so DNS and static IP has to be configured on every reboot.
+- Kernel 4.6.3 has some differeces from Android 7.1 (cachegrab original target, whose kernel is at 3.18). Migration was done for cachegrab right now but may have further issues.
+
 - - - - -
 # Cachegrab
 Cachegrab is a tool designed to help perform and visualize trace-driven cache
