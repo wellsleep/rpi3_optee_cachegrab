@@ -73,10 +73,15 @@ inline void probes_process_generic(struct probe *p, struct scope_sample *s)
 			prev = p->raw_buf[j * nsets + i];
 			if (val > prev)
 				cnt += 1;
+			// add raw delta for offline cache analysis
+			s->data[offs + i] = (val - prev) << (8 - 2 * j); // push raw delta to high 8b
 		}
-		s->data[offs + i] = cnt;
+		//s->data[offs + i] = cnt;
+		s->data[offs + i] += cnt; // low 8b is cnt, high 8b is raw delta
 	}
 	s->data_offs += nsets;
+	//for debug
+	DEBUG("cache stat at 0-way-0-set: %x", s->data[s->data_offs]);
 }
 
 inline void probes_refill_generic(struct probe *p)

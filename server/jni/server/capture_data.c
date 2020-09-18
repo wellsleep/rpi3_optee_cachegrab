@@ -47,15 +47,18 @@ struct capture_data* capture_data_retrieve () {
   nsamples = scope_sample_count();
 
   // Allocate it
-  uint8_t* tmp=NULL;
+  uint16_t* tmp = NULL;
+  //uint8_t* tmp=NULL;
   size_t tmp_sz = nsamples * desc.total_size;
-  tmp = (uint8_t*)malloc(tmp_sz);
+  //tmp = (uint8_t*)malloc(tmp_sz);
+  tmp = (uint16_t*)malloc(tmp_sz);
   //fprintf(stdout, "malloc ptr=%p\n", tmp);
   if (!tmp)
     goto fail;
 
   if (desc.l1d.size > 0) {
-    ret->l1d_probe.data = (uint8_t*)malloc(nsamples * desc.l1d.size);
+    //ret->l1d_probe.data = (uint8_t*)malloc(nsamples * desc.l1d.size);
+    ret->l1d_probe.data = (uint16_t*)malloc(nsamples * desc.l1d.size);
     if (!ret->l1d_probe.data)
       goto fail;
     ret->l1d_probe.collected = true;
@@ -64,7 +67,8 @@ struct capture_data* capture_data_retrieve () {
   }
 
   if (desc.l1i.size > 0) {
-    ret->l1i_probe.data = (uint8_t*)malloc(nsamples * desc.l1i.size);
+    //ret->l1i_probe.data = (uint8_t*)malloc(nsamples * desc.l1i.size);
+    ret->l1i_probe.data = (uint16_t*)malloc(nsamples * desc.l1i.size);
     if (!ret->l1i_probe.data)
       goto fail;
     ret->l1i_probe.collected = true;
@@ -73,7 +77,8 @@ struct capture_data* capture_data_retrieve () {
   }
 
   if (desc.btb.size > 0) {
-    ret->btb_probe.data = (uint8_t*)malloc(nsamples * desc.btb.size);
+    //ret->btb_probe.data = (uint8_t*)malloc(nsamples * desc.btb.size);
+    ret->btb_probe.data = (uint16_t*)malloc(nsamples * desc.btb.size);
     if (!ret->btb_probe.data)
       goto fail;
     ret->btb_probe.collected = true;
@@ -88,7 +93,7 @@ struct capture_data* capture_data_retrieve () {
 
   // Fill in capture data structure
   for (unsigned int i = 0; i < nsamples; i++) {
-    uint8_t *src, *dst;
+    uint16_t *src, *dst; // mod from uint8_t
 
     // Copy l1d data
     if (ret->l1d_probe.collected) {
@@ -194,7 +199,16 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
   if (rows == NULL)
     goto end;
 
-  memcpy(data, d->data, data_sz);
+  // dereference uint16_t to uint8_t
+  uint8_t *delta_data = NULL;
+  delta_data = (uint8_t *)malloc(data_sz);
+  for(unsigned int i = 0; i < data_sz; i++) {
+	  delta_data[i] = (uint8_t )(*(d->data + i) >> 8);
+	  data[i] = (uint8_t)(*(d->data + i) & 0xFF);
+  }
+
+  //original cpy is useless
+  //memcpy(data, d->data, data_sz);
   for (unsigned int i = 0; i < d->sample_count; i++) {
     rows[i] = data + (d->sample_width * i);
   }
@@ -205,6 +219,17 @@ void* capture_data_encode (struct probe_data* d, size_t *len) {
   ret = enc.buf;
   *len = enc.len;
   enc.buf = NULL;
+
+  // save raw delta data into files
+  time_t t;
+  time(&t);
+  char *fname = ctime(&t);
+  
+  FILE *fp = fopen(fname, "wb");
+  fwrite(delta_data, sizeof(uint8_t), data_sz, fp);
+  fclose(fp);
+
+  printf("raw delta fname: %s\n", fname);
 
   // [lz]
   // fprintf(stdout, "png encoding done! \n");

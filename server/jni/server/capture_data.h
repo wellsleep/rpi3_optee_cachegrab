@@ -35,7 +35,8 @@ struct enc_buffer {
 
 struct probe_data {
   bool collected;
-  uint8_t *data;
+  //uint8_t *data; change to u16 to save raw delta
+  uint16_t *data;
   unsigned int sample_count;
   size_t sample_width;
 };

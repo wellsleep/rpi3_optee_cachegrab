@@ -50,7 +50,8 @@ struct scope_sample {
 	bool collected;
 	struct scope *scope;
 	size_t data_offs;
-	u8 data[1];		// Variable length data
+	//u8 data[1];		// Variable length data
+	u16 data[1];		// [lz] change from u8 to u16, save raw delta value on high 8b
 };
 
 struct field {
