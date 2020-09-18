@@ -1,4 +1,5 @@
-/* copyright (c) 2016, Linaro Limited
+/*
+ * Copyright (c) 2016, Linaro Limited
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +31,7 @@
 
 /* OP-TEE TEE client API (built by optee_client) */
 #include <tee_client_api.h>
-
+/* set serial port variable */
 #include <unistd.h>    /* unix func def */
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -39,26 +40,29 @@
 #include <errno.h>
 #include <stdlib.h>
 
-
-#define TA_RSA_DEMO_UUID { 0x5b85f6c9, 0xebcf, 0x490d, \
-    { 0xbe, 0x73, 0x60, 0xa7, 0xa2, 0x5a, 0x61, 0xdf } }
+#define TA_CRYPT_DEMO_ECC_UUID {0xde8c5e8f, 0x2e10, 0x41ea, \
+    { 0xa8, 0x59, 0xca, 0x8f, 0xed, 0xdb, 0x88, 0x88 } }
 
 /* The Trusted Application Function ID(s) implemented in this TA */
-#define TA_DECRYPT_DEMO_CMD_RSA 0
-
-
+#define TA_ENCRYPT_DEMO_CMD_AES 0
+#define TA_ENCRYPT_DEMO_CMD_RSA 1
+#define TA_ENCRYPT_DEMO_CMD_DIGEST 2
+#define TA_SIGN_DEMO_CMD_ECC 3
 
 static TEEC_Context ctx;
 static TEEC_Session sess;
 
+/* set option of serial port */
 int set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop)
 {
     struct termios newtio,oldtio;
+    //#if 0
     if  ( tcgetattr( fd,&oldtio)  !=  0)
     {
         perror("SetupSerial 1");
         return -1;
     }
+    //#endif
     bzero( &newtio, sizeof( newtio ) );
     newtio.c_cflag  |=  CLOCAL | CREAD;
     newtio.c_cflag &= ~CSIZE;
@@ -125,7 +129,7 @@ int set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop)
         newtio.c_cflag |=  CSTOPB;
     }
     newtio.c_cc[VTIME]  = 0;
-    newtio.c_cc[VMIN] = 16;
+    newtio.c_cc[VMIN] = 64;
     tcflush(fd,TCIFLUSH);
     if((tcsetattr(fd,TCSANOW,&newtio))!=0)
     {
@@ -209,89 +213,103 @@ int open_port(int fd,int comport)
     return fd;
 }
 
-
 int main(int argc, char *argv[])
 {
     TEEC_Result res;
     TEEC_Operation op;
-    TEEC_UUID uuid = TA_RSA_DEMO_UUID;
+    TEEC_UUID uuid = TA_CRYPT_DEMO_ECC_UUID;
     uint32_t err_origin;
-    int i;
-    /* set variable */
-    char outData[2048]={"0"};
+    uint8_t i = 0;
 
+    /* ciphertext variable */
+//    uint8_t outData[64]="0";
+    uint8_t outData[64]={0};
 
-    int nread,temp;
-    char buff[16]="";
+    /* serial variable */
+    int nread1,nread2,temp;
+//    char buff[32] = "";
+    char buff[64] = {0,1,2,3,4,5,6,7,8,9};
     int fd;
+
     /* Initialize a context connecting us to the TEE */
     res = TEEC_InitializeContext(NULL, &ctx);
     if (res != TEEC_SUCCESS)
         errx(1, "TEEC_InitializeContext failed with code 0x%x", res);
 
-    /* open a session */
     res = TEEC_OpenSession(&ctx, &sess, &uuid,
             TEEC_LOGIN_PUBLIC, NULL, NULL, &err_origin);
     if (res != TEEC_SUCCESS)
         errx(1, "TEEC_Opensession failed with code 0x%x origin 0x%x",
                 res, err_origin);
-    /* -= start RSA algorithm =- */
 
+/*
     if((fd=open_port(fd,3))<0)
     {
         perror("open_port error");
-        return 1;
+        return 0;
     }
     if((i=set_opt(fd,115200,8,'N',1))<0)
     {
         perror("set_opt error");
-        return 1;
+        return 0;
     }
     printf("fd=%d\n",fd);
-    while(1){
+*/
+    do {
         /* read from serial */
-        memset(buff,0,sizeof(buff));
-        nread = read(fd, buff,16);//16 byte input
-        /*if(nread != -1)
-            printf("read complete \n");
-        printf("input is :\n");
-        for (i = 0 ; i < 16; i ++) {
+        //memset(buff,0,sizeof(buff));
+        //nread1 = read(fd, buff, 64);//64 byte input
+#if 0
+        if(nread1 != -1)
+            printf("read1 complete \n");
+        if(nread2 != -1)
+            printf("read2 complete \n");
+        for (i = 0 ; i<64; i ++)
             printf("%02x ", buff[i]);
-        }
-        printf("\n");*/
-
+        printf("\n");
+        printf("the size is %d \n",(int )sizeof(buff));
+#endif
         memset(&op, 0, sizeof(op));
-        op.paramTypes = TEEC_PARAM_TYPES (TEEC_MEMREF_TEMP_INOUT,
+        op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INOUT,
                 TEEC_MEMREF_TEMP_INOUT,
                 TEEC_VALUE_INPUT,
-                TEEC_NONE);
+				TEEC_NONE);
 
+        /* normal route */
         op.params[0].tmpref.buffer = buff;
         op.params[0].tmpref.size = sizeof (buff);
         op.params[1].tmpref.buffer = outData;
-        op.params[1].tmpref.size = sizeof (outData);
-        op.params[2].value.a = 1;
+        op.params[1].tmpref.size = sizeof (outData); //outData = 64 bytes
 
-        res = TEEC_InvokeCommand(&sess, TA_DECRYPT_DEMO_CMD_RSA, &op,
+	//printf("I'm starting to invoke command\n");
+        res = TEEC_InvokeCommand(&sess, TA_SIGN_DEMO_CMD_ECC, &op,
                 &err_origin);
+	//printf("Hello, invoking command finished\n");
         if (res != TEEC_SUCCESS)
             errx(1, "TEEC_InvokeCommand failed with code 0x%x origin 0x%x",
                     res, err_origin);
-        /*printf("output is :\n");
-        for (i = 0 ; i < op.params[1].tmpref.size; i ++) {
-            printf("%02x ", outData[i]);
-        }
-        printf("\n");*/
 
         /* write to serial */
-        temp = write(fd, outData,op.params[1].tmpref.size);
-        /*if (temp != -1){
+        //temp = write(fd, outData, op.params[1].tmpref.size);
+	printf("outData: %x %x %x %x\n", outData[0], outData[1], outData[2], outData[3]);
+#if 0
+        if (temp != -1){
             printf("write complete\n");
-        }*/
-    }
+        }
 
-    close(fd);
+
+        /* test purpose only */
+	for(int j=0; j<64; j++) {
+	   printf("%02x ", outData[j]);
+	}
+	printf("\n");
+        printf("ecc CA execution done!\n");
+#endif
+    } while(0);
+    //close(fd);
+
     TEEC_CloseSession(&sess);
     TEEC_FinalizeContext(&ctx);
+
     return 0;
 }

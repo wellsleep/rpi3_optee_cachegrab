@@ -11,7 +11,7 @@ OBJS = main.o
 CFLAGS += -Wall -I$(TEEC_EXPORT)/include -I../ta/include -I./include
 LDADD += -lteec -L$(TEEC_EXPORT)/lib
 
-BINARY = optee_aes
+BINARY = optee_rsa
 
 .PHONY: all
 all: $(BINARY)
