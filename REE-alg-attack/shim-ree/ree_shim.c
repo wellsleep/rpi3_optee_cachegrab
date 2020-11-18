@@ -168,13 +168,13 @@ int REE_run(int trig) {
   bool intercepting = false;
   int res;
   cg_log("Start to run custom algos");
-  cg_buf("CBUF", trig, sizeof(int));
+  cg_buf("CBUF", trig, sizeof(int)); // read trigger buf value from here
   if (valid &&
       sizeof(trig) >= target_clen) {
     cg_log("Intercepting command");
     intercepting = true;
   }
-  cg_log("valid? %d", valid);
+  //cg_log("valid? %d", valid);
   if (intercepting) {
     start_intercept();
   }
@@ -185,7 +185,7 @@ int REE_run(int trig) {
   return res;
 }
 
-int my_func() {
+int my_func() { // add custom code here which is supposed to be run in REE
   int i = 0, sum = 0, j = 0;
   for(i = 0; i < 20000; i++) {
 	  for(j = 0; j<20000; j++)
