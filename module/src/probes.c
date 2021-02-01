@@ -68,13 +68,14 @@ inline void probes_process_generic(struct probe *p, struct scope_sample *s)
 	nways = p->cache_shape.associativity;
 	for (i = 0; i < nsets; i++) {
 		u8 cnt = 0;
+		s->data[offs + i] = 0;
 		for (j = 0; j < nways; j++) {
 			val = p->raw_buf[j * nsets + i + 1];
 			prev = p->raw_buf[j * nsets + i];
 			if (val > prev)
 				cnt += 1;
-			// add raw delta for offline cache analysis
-			s->data[offs + i] = (val - prev) << (8 - 2 * j); // push raw delta to high 8b
+			// add raw delta for offline cache analysis. bit 0 move to bit 14
+			s->data[offs + i] += (val - prev) << (2 * nways - 2 * j + 8 - 2); // push raw delta to high 8b
 		}
 		//s->data[offs + i] = cnt;
 		s->data[offs + i] += cnt; // low 8b is cnt, high 8b is raw delta
