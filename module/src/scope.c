@@ -371,7 +371,8 @@ void scope_retrieve(void *buf, size_t * len)
 	struct scope_sample_description d;
 	struct list_head *cur, *next;
 	struct scope_sample *samp;
-	u8 *cur_loc;
+	//u8 *cur_loc;
+	u16 *cur_loc;
 
 	if (buf == NULL || len == NULL)
 		//DEBUG("buf is NULL in scope_retrieve!");
@@ -383,7 +384,8 @@ void scope_retrieve(void *buf, size_t * len)
 	samp_size = d.total_size;
 	remaining = *len;
 	written = 0;
-	cur_loc = (u8 *) buf;
+	//cur_loc = (u8 *) buf;
+	cur_loc = (u16 *) buf;
 	//DEBUG("cur_loc=%p, about to loop", cur_loc);
 
 	list_for_each_safe(cur, next, &collected_samples) {
