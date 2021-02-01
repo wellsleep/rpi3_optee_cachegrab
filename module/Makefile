@@ -28,4 +28,4 @@ style:
 	indent -linux src/*.c src/*.h
 
 clean:
-	rm -rf *.o *.mod.* *.o.* *.ko.* src/*.o
+	rm -rf *.o *.mod.* *.o.* *.ko.* src/*.o *.symvers *.order

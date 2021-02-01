@@ -324,6 +324,7 @@ unsigned int scope_collect(unsigned int delay, unsigned int timeout)
 			return 0;
 		}
 		smp_call_function_single(cpu, probes_collect, samp, true);
+		//DEBUG("smp_call done!\n");
 		ndelay(delay);
 	}
 

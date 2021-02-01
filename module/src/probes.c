@@ -141,7 +141,7 @@ void probes_collect(void *p)
 	} else {
 		s->collected = false;
 	}
-
 	local_irq_restore(interrupt_flags);
+	//DEBUG("probes_collect done!\n");
 	return;
 }
